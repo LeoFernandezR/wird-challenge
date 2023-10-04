@@ -1,16 +1,10 @@
-import { AppDispatch, RootState } from "@/store";
-import { loadingPokemons, pokemonById } from "@/store/slices/PokemonList";
-import {
-  pokemonTeam,
-  removePokemon,
-  addPokemon,
-} from "@/store/slices/PokemonTeam";
-import Pokemon from "@/types/pokemon";
+import usePokemonTeam from "@/hooks/usePokemonTeam";
+import { RootState } from "@/store";
+import { pokemonById } from "@/store/slices/PokemonList";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 import { TbArrowBigLeftLineFilled } from "react-icons/tb";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 type Props = {};
 
@@ -20,16 +14,8 @@ const PokemonPage = (props: Props) => {
   const pokemon = useSelector((state: RootState) =>
     pokemonById(state, parseInt(id))
   );
-  const team = useSelector(pokemonTeam);
-  const dispatch = useDispatch<AppDispatch>();
-
-  const handlePokemonTeam = (pokemon: Pokemon) => {
-    if (team.includes(pokemon)) {
-      return dispatch(removePokemon(pokemon.id));
-    }
-
-    dispatch(addPokemon(pokemon));
-  };
+  const { handleTogglePokemon, isPokemonOnTeam, isPokemonTeamFull } =
+    usePokemonTeam();
 
   if (!pokemon) {
     return (
@@ -105,7 +91,7 @@ const PokemonPage = (props: Props) => {
             </p>
             <div>
               <p className="mb-2 underline">Base Stats:</p>
-              <ul className="pl-8 list-disc flex flex-col gap-2 text-base">
+              <ul className="pl-8 list-disc flex flex-col gap-2">
                 {pokemon?.stats.map((poke) => (
                   <li key={poke.stat.url}>
                     <p>
@@ -120,13 +106,13 @@ const PokemonPage = (props: Props) => {
         </div>
       </div>
       <button
-        disabled={!team.includes(pokemon) && team.length === 6}
-        onClick={() => handlePokemonTeam(pokemon)}
+        disabled={!isPokemonOnTeam(pokemon) && isPokemonTeamFull}
+        onClick={() => handleTogglePokemon(pokemon)}
         className={`rounded-full text-lg border-2 border-white pl-2 pr-2 pb-2 hover:animate-pulse-fast disabled:bg-blue-950 disabled:cursor-not-allowed disabled:animate-none w-auto ${
-          team.includes(pokemon) ? "bg-red-700" : "bg-blue-700"
+          isPokemonOnTeam(pokemon) ? "bg-red-700" : "bg-blue-700"
         }`}
       >
-        {team.includes(pokemon) ? "Remove from team" : "Add to team"}
+        {isPokemonOnTeam(pokemon) ? "Remove from team" : "Add to team"}
       </button>
     </div>
   );

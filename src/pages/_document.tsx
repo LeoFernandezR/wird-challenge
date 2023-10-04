@@ -21,7 +21,6 @@ export default function Document() {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        <title>Pokemon Challenge</title>
       </Head>
       <body>
         <Main />

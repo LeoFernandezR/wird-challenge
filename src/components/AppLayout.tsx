@@ -1,9 +1,11 @@
+import usePokemonTeam from "@/hooks/usePokemonTeam";
 import { AppDispatch } from "@/store";
 import { getPokemons, loadingPokemons } from "@/store/slices/PokemonList";
-import { pokemonTeam, removePokemon } from "@/store/slices/PokemonTeam";
+import { removePokemon } from "@/store/slices/PokemonTeam";
+import Pokemon from "@/types/pokemon";
 import { ReactNode, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { MdGamepad } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,8 +13,13 @@ interface LayoutProps {
 
 export default function AppLayout({ children }: LayoutProps) {
   const loading = useSelector(loadingPokemons);
-  const team = useSelector(pokemonTeam);
   const dispatch = useDispatch<AppDispatch>();
+
+  const handleRemovePokemon = (pokemon: Pokemon) => {
+    dispatch(removePokemon(pokemon.id));
+  };
+
+  const { team, isPokemonTeamEmpty } = usePokemonTeam();
 
   useEffect(() => {
     dispatch(getPokemons());
@@ -34,10 +41,10 @@ export default function AppLayout({ children }: LayoutProps) {
         </div>
       </section>
       <aside className="bg-yellow-500 flex-1 flex flex-col p-10 pl-0">
-        <div className="max-h-[420px] h-full flex flex-col justify-center">
-          <div className="rounded-lg bg-black h-full flex flex-col items-center">
+        <div className="max-h-[450px] h-full flex flex-col justify-center">
+          <div className="rounded-lg bg-black h-full flex flex-col items-center pt-6">
             <h2 className="text-2xl text-center mb-4">Pokemon Team</h2>
-            {team.length === 0 ? (
+            {isPokemonTeamEmpty ? (
               <div className="flex flex-1 justify-center items-center">
                 <p className="text-xs xl:text-base">
                   You don&apos;t have a team :(
@@ -55,6 +62,7 @@ export default function AppLayout({ children }: LayoutProps) {
                         <img
                           className="w-full"
                           src={pokemon.sprites.front_default}
+                          alt={pokemon.name}
                           style={{
                             imageRendering: "pixelated",
                           }}
@@ -63,7 +71,7 @@ export default function AppLayout({ children }: LayoutProps) {
                       <p className="capitalize text-xs mb-2">{pokemon.name}</p>
                     </div>
                     <button
-                      onClick={() => dispatch(removePokemon(pokemon.id))}
+                      onClick={() => handleRemovePokemon(pokemon)}
                       className="text-xs absolute top-0 right-0 m-2"
                     >
                       X
