@@ -1,10 +1,16 @@
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 import { loadingPokemons, pokemonById } from "@/store/slices/PokemonList";
+import {
+  pokemonTeam,
+  removePokemon,
+  addPokemon,
+} from "@/store/slices/PokemonTeam";
+import Pokemon from "@/types/pokemon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { TbArrowBigLeftLineFilled } from "react-icons/tb";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 type Props = {};
 
@@ -14,8 +20,35 @@ const PokemonPage = (props: Props) => {
   const pokemon = useSelector((state: RootState) =>
     pokemonById(state, parseInt(id))
   );
+  const team = useSelector(pokemonTeam);
+  const dispatch = useDispatch<AppDispatch>();
 
-  console.log(pokemon);
+  const handlePokemonTeam = (pokemon: Pokemon) => {
+    if (team.includes(pokemon)) {
+      return dispatch(removePokemon(pokemon.id));
+    }
+
+    dispatch(addPokemon(pokemon));
+  };
+
+  if (!pokemon) {
+    return (
+      <div className="h-full flex-1 flex flex-col justify-center items-center relative">
+        <h1 className="text-3xl">
+          Invalid Pokemon number, this app accepts the firsts 151 Pokemons only.
+        </h1>
+        <Link
+          className="absolute top-0 right-0  text-lg hover:animate-pulse-fast"
+          href="/"
+        >
+          <span className="pl-2 pr-2 pb-2 border-2 mr-1 border-white rounded-full">
+            <TbArrowBigLeftLineFilled className="text-white inline text-3xl mr-2" />
+            BACK
+          </span>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-full flex-1 flex flex-col ">
@@ -86,6 +119,15 @@ const PokemonPage = (props: Props) => {
           </div>
         </div>
       </div>
+      <button
+        disabled={!team.includes(pokemon) && team.length === 6}
+        onClick={() => handlePokemonTeam(pokemon)}
+        className={`rounded-full text-lg border-2 border-white pl-2 pr-2 pb-2 hover:animate-pulse-fast disabled:bg-blue-950 disabled:cursor-not-allowed disabled:animate-none w-auto ${
+          team.includes(pokemon) ? "bg-red-700" : "bg-blue-700"
+        }`}
+      >
+        {team.includes(pokemon) ? "Remove from team" : "Add to team"}
+      </button>
     </div>
   );
 };

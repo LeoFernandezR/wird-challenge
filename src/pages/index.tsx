@@ -43,9 +43,9 @@ export default function Home() {
             >
               <Link
                 href={`/pokemon/${pokemon.id}`}
-                className="hover:cursor-pointer hover:grayscale-[100%] transition-all"
+                className="hover:cursor-pointer group transition-all"
               >
-                <div className="w-36 h-36">
+                <div className="w-36 h-36 group-hover:brightness-75">
                   <img
                     className="w-full"
                     src={pokemon.sprites.front_default}
@@ -54,7 +54,7 @@ export default function Home() {
                     }}
                   ></img>
                 </div>
-                <p className="capitalize text-sm mb-2 text-center">
+                <p className="capitalize text-sm mb-2 text-center group-hover:text-yellow-500">
                   {pokemon.name}
                 </p>
               </Link>
